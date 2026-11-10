@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LISTO.Api/LISTO.Api.csproj" />
+    <Project Path="src/LISTO.Application/LISTO.Application.csproj" />
+    <Project Path="src/LISTO.Domain/LISTO.Domain.csproj" />
+    <Project Path="src/LISTO.Infrastructure/LISTO.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LISTO.Tests/LISTO.Tests.csproj" />
+  </Folder>
+</Solution>
