@@ -1,4 +1,9 @@
 <Solution>
+  <Folder Name="/Entities/">
+    <File Path="Rol.cs" />
+    <File Path="Usuario.cs" />
+    <File Path="UsuarioRol.cs" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/LISTO.Api/LISTO.Api.csproj" />
     <Project Path="src/LISTO.Application/LISTO.Application.csproj" />

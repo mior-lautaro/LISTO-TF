@@ -7,8 +7,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="10.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
   </ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="LISTO.Tests" />
+	</ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
