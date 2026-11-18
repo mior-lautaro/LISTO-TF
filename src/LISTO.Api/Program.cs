@@ -8,6 +8,8 @@ using LISTO.Infrastructure.Generators;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // Configurar la conexión a PostgreSQL.
 var connectionString = builder.Configuration
     .GetConnectionString("ListoDb");
@@ -57,8 +59,12 @@ builder.Services.AddScoped<IUsuarioRolService, UsuarioRolService>();
 builder.Services.AddScoped<
     ICodigoInstitucionalGenerator,
     PostgresCodigoInstitucionalGenerator>();
+builder.Services.AddScoped<IEjercicioService, EjercicioService>();
+builder.Services.AddScoped<IIntentoService, IntentoService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<IEjercicioRepository, EjercicioRepository>();
+builder.Services.AddScoped<IIntentoRepository, IntentoRepository>();
 
 var app = builder.Build();
 

@@ -226,4 +226,99 @@ public class ModeloPersistenciaTests
             "timestamp with time zone",
             propiedad.GetColumnType());
     }
+
+    [Fact]
+    public void Modelo_ContieneLasEntidadesEjercicioYVersion()
+    {
+        using var context = CrearContexto();
+
+        Assert.NotNull(
+            context.Model.FindEntityType(typeof(Ejercicio)));
+
+        Assert.NotNull(
+            context.Model.FindEntityType(typeof(EjercicioVersion)));
+    }
+
+    [Fact]
+    public void EjercicioVersion_UtilizaLaTablaEsperada()
+    {
+        using var context = CrearContexto();
+
+        var entidad = context.Model.FindEntityType(
+            typeof(EjercicioVersion))!;
+
+        Assert.Equal("ejercicio_version", entidad.GetTableName());
+    }
+
+    [Fact]
+    public void EjercicioVersion_TieneClavePrimariaConfigurada()
+    {
+        using var context = CrearContexto();
+
+        var entidad = context.Model.FindEntityType(
+            typeof(EjercicioVersion))!;
+
+        Assert.Equal(
+            nameof(EjercicioVersion.EjercicioVersionId),
+            Assert.Single(entidad.FindPrimaryKey()!.Properties).Name);
+    }
+
+    [Fact]
+    public void EjercicioVersion_TieneClaveForaneaHaciaEjercicio()
+    {
+        using var context = CrearContexto();
+
+        var entidad = context.Model.FindEntityType(
+            typeof(EjercicioVersion))!;
+
+        var relacion = Assert.Single(entidad.GetForeignKeys());
+
+        Assert.Equal(
+            typeof(Ejercicio),
+            relacion.PrincipalEntityType.ClrType);
+
+        Assert.Equal(
+            DeleteBehavior.Restrict,
+            relacion.DeleteBehavior);
+    }
+
+    [Fact]
+    public void EjercicioVersion_TieneIndiceUnicoFiltradoParaPublicadas()
+    {
+        using var context = CrearContexto();
+
+        var entidad = context.Model.FindEntityType(
+            typeof(EjercicioVersion))!;
+
+        var indice = Assert.Single(
+            entidad.GetIndexes(),
+            i => i.GetDatabaseName() ==
+                "ux_ejercicio_version_publicada");
+
+        Assert.True(indice.IsUnique);
+        Assert.Equal("estado = 3", indice.GetFilter());
+    }
+
+    [Fact]
+    public void EjercicioVersion_TieneRestriccionesCheckEsperadas()
+    {
+        using var context = CrearContexto();
+
+        var modelo = context
+            .GetService<IDesignTimeModel>()
+            .Model;
+
+        var entidad = modelo.FindEntityType(
+            typeof(EjercicioVersion))!;
+
+        Assert.Contains(
+            entidad.GetCheckConstraints(),
+            c => c.Name ==
+                "ck_ejercicio_version_numero_positivo");
+
+        Assert.Contains(
+            entidad.GetCheckConstraints(),
+            c => c.Name ==
+                "ck_ejercicio_version_estado_valido");
+    }
 }

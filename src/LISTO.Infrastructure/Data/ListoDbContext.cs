@@ -34,6 +34,17 @@ public class ListoDbContext : DbContext
 
     public DbSet<Ejercicio> Ejercicios => Set<Ejercicio>();
 
+    public DbSet<EspacioCompletar> EspaciosCompletar => Set<EspacioCompletar>();
+    public DbSet<VarianteRespuesta> VariantesRespuesta => Set<VarianteRespuesta>();
+
+    public DbSet<Intento> Intentos => Set<Intento>();
+
+    public DbSet<EjercicioVersion> EjerciciosVersiones =>
+    Set<EjercicioVersion>();
+
+    public DbSet<Respuesta> Respuestas => Set<Respuesta>();
+
+    public DbSet<RespuestaLibre> RespuestasLibres => Set<RespuestaLibre>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -50,6 +61,18 @@ public class ListoDbContext : DbContext
         modelBuilder.ApplyConfiguration(new InscripcionConfiguration());
 
         modelBuilder.ApplyConfiguration(new EjercicioConfiguration());
+        modelBuilder.ApplyConfiguration(new EjercicioVersionConfiguration());
+        modelBuilder.ApplyConfiguration(new PreguntaConfiguration());
+        modelBuilder.ApplyConfiguration(new ConfiguracionRespuestaLibreConfiguration());
+
+        modelBuilder.ApplyConfiguration(new CriterioEvaluacionConfiguration());
+        modelBuilder.ApplyConfiguration(new OpcionPreguntaConfiguration());
+        modelBuilder.ApplyConfiguration(new ConfiguracionVerdaderoFalsoConfiguration());
+        modelBuilder.ApplyConfiguration(new EspacioCompletarConfiguration());
+        modelBuilder.ApplyConfiguration(new VarianteRespuestaConfiguration());
+        modelBuilder.ApplyConfiguration(new IntentoConfiguration());
+        modelBuilder.ApplyConfiguration(new RespuestaConfiguration());
+        modelBuilder.ApplyConfiguration(new RespuestaLibreConfiguration());
 
     }
 }

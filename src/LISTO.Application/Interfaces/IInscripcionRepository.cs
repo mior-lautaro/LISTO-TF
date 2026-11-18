@@ -26,4 +26,9 @@ public interface IInscripcionRepository
 
     Task<int> GuardarCambiosAsync(
         CancellationToken cancellationToken = default);
+
+    Task<bool> TieneInscripcionActivaEnCursoAsync(
+    long estudianteId,
+    long cursoId,
+    CancellationToken cancellationToken = default);
 }

@@ -22,6 +22,83 @@ namespace LISTO.Infrastructure.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("LISTO.Domain.Entities.ConfiguracionRespuestaLibre", b =>
+                {
+                    b.Property<long>("PreguntaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("pregunta_id");
+
+                    b.Property<string>("RespuestaReferencia")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("respuesta_referencia");
+
+                    b.HasKey("PreguntaId");
+
+                    b.ToTable("configuracion_respuesta_libre", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_configuracion_respuesta_libre_referencia_no_vacia", "length(trim(respuesta_referencia)) > 0");
+                        });
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.ConfiguracionVerdaderoFalso", b =>
+                {
+                    b.Property<long>("PreguntaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("pregunta_id");
+
+                    b.Property<bool>("RespuestaCorrecta")
+                        .HasColumnType("boolean")
+                        .HasColumnName("respuesta_correcta");
+
+                    b.HasKey("PreguntaId");
+
+                    b.ToTable("configuracion_verdadero_falso", (string)null);
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.CriterioEvaluacion", b =>
+                {
+                    b.Property<long>("CriterioEvaluacionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("criterio_evaluacion_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("CriterioEvaluacionId"));
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("descripcion");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("integer")
+                        .HasColumnName("orden");
+
+                    b.Property<decimal>("Ponderacion")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("ponderacion");
+
+                    b.Property<long>("PreguntaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("pregunta_id");
+
+                    b.HasKey("CriterioEvaluacionId");
+
+                    b.HasIndex("PreguntaId", "Orden")
+                        .IsUnique()
+                        .HasDatabaseName("ux_criterio_evaluacion_pregunta_orden");
+
+                    b.ToTable("criterio_evaluacion", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_criterio_evaluacion_descripcion_no_vacia", "length(trim(descripcion)) > 0");
+
+                            t.HasCheckConstraint("ck_criterio_evaluacion_orden", "orden > 0");
+
+                            t.HasCheckConstraint("ck_criterio_evaluacion_ponderacion", "ponderacion > 0 AND ponderacion <= 100");
+                        });
+                });
+
             modelBuilder.Entity("LISTO.Domain.Entities.Curso", b =>
                 {
                     b.Property<long>("CursoId")
@@ -98,6 +175,90 @@ namespace LISTO.Infrastructure.Data.Migrations
                         {
                             t.HasCheckConstraint("ck_ejercicio_estado_valido", "estado IN (1, 2)");
                         });
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.EjercicioVersion", b =>
+                {
+                    b.Property<long>("EjercicioVersionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("ejercicio_version_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("EjercicioVersionId"));
+
+                    b.Property<long>("EjercicioId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ejercicio_id");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("integer")
+                        .HasColumnName("estado");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_creacion");
+
+                    b.Property<DateTime?>("FechaPublicacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_publicacion");
+
+                    b.Property<int>("NumeroVersion")
+                        .HasColumnType("integer")
+                        .HasColumnName("numero_version");
+
+                    b.HasKey("EjercicioVersionId");
+
+                    b.HasIndex("EjercicioId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_ejercicio_version_publicada")
+                        .HasFilter("estado = 3");
+
+                    b.HasIndex("EjercicioId", "NumeroVersion")
+                        .IsUnique()
+                        .HasDatabaseName("ux_ejercicio_version_ejercicio_numero");
+
+                    b.ToTable("ejercicio_version", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_ejercicio_version_estado_valido", "estado IN (1, 2, 3, 4)");
+
+                            t.HasCheckConstraint("ck_ejercicio_version_numero_positivo", "numero_version > 0");
+                        });
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.EspacioCompletar", b =>
+                {
+                    b.Property<long>("EspacioCompletarId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("espacio_completar_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("EspacioCompletarId"));
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("integer")
+                        .HasColumnName("orden");
+
+                    b.Property<decimal?>("Ponderacion")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("ponderacion");
+
+                    b.Property<long>("PreguntaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("pregunta_id");
+
+                    b.Property<string>("RespuestaEsperada")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("respuesta_esperada");
+
+                    b.HasKey("EspacioCompletarId");
+
+                    b.HasIndex("PreguntaId", "Orden")
+                        .IsUnique();
+
+                    b.ToTable("espacio_completar", (string)null);
                 });
 
             modelBuilder.Entity("LISTO.Domain.Entities.Estudiante", b =>
@@ -188,6 +349,105 @@ namespace LISTO.Infrastructure.Data.Migrations
                             t.HasCheckConstraint("ck_inscripcion_estado_valido", "estado IN (1, 2, 3, 4, 5)");
 
                             t.HasCheckConstraint("ck_inscripcion_fecha_resolucion", "(estado = 1 AND fecha_resolucion IS NULL) OR (estado IN (2, 3, 4, 5) AND fecha_resolucion IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.Intento", b =>
+                {
+                    b.Property<long>("IntentoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("intento_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("IntentoId"));
+
+                    b.Property<long>("EjercicioId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ejercicio_id");
+
+                    b.Property<long>("EjercicioVersionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ejercicio_version_id");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("integer")
+                        .HasColumnName("estado");
+
+                    b.Property<long>("EstudianteId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("estudiante_id");
+
+                    b.Property<DateTime?>("FechaEnvio")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_envio");
+
+                    b.Property<DateTime?>("FechaEvaluacion")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_evaluacion");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_inicio");
+
+                    b.HasKey("IntentoId");
+
+                    b.HasIndex("EjercicioId");
+
+                    b.HasIndex("EjercicioVersionId");
+
+                    b.HasIndex("EstudianteId", "EjercicioId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_intento_estudiante_ejercicio_en_curso")
+                        .HasFilter("estado = 1");
+
+                    b.ToTable("intento", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_intento_estado_valido", "estado IN (1, 2, 3)");
+
+                            t.HasCheckConstraint("ck_intento_fechas_estado", "(estado = 1 AND fecha_envio IS NULL AND fecha_evaluacion IS NULL) OR (estado = 2 AND fecha_envio IS NOT NULL AND fecha_evaluacion IS NULL) OR (estado = 3 AND fecha_envio IS NOT NULL AND fecha_evaluacion IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.OpcionPregunta", b =>
+                {
+                    b.Property<long>("OpcionPreguntaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("opcion_pregunta_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("OpcionPreguntaId"));
+
+                    b.Property<bool>("EsCorrecta")
+                        .HasColumnType("boolean")
+                        .HasColumnName("es_correcta");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("integer")
+                        .HasColumnName("orden");
+
+                    b.Property<long>("PreguntaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("pregunta_id");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("texto");
+
+                    b.HasKey("OpcionPreguntaId");
+
+                    b.HasIndex("PreguntaId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_opcion_pregunta_correcta")
+                        .HasFilter("es_correcta = TRUE");
+
+                    b.HasIndex("PreguntaId", "Orden")
+                        .IsUnique()
+                        .HasDatabaseName("ux_opcion_pregunta_pregunta_orden");
+
+                    b.ToTable("opcion_pregunta", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_opcion_pregunta_orden_positivo", "orden > 0");
                         });
                 });
 
@@ -342,6 +602,96 @@ namespace LISTO.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("LISTO.Domain.Entities.Pregunta", b =>
+                {
+                    b.Property<long>("PreguntaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("pregunta_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("PreguntaId"));
+
+                    b.Property<long>("EjercicioVersionId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ejercicio_version_id");
+
+                    b.Property<string>("Enunciado")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("enunciado");
+
+                    b.Property<int?>("ModoCorreccionCompletar")
+                        .HasColumnType("integer")
+                        .HasColumnName("modo_correccion_completar");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("integer")
+                        .HasColumnName("tipo");
+
+                    b.HasKey("PreguntaId");
+
+                    b.HasIndex("EjercicioVersionId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_pregunta_ejercicio_version");
+
+                    b.ToTable("pregunta", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_pregunta_tipo_valido", "tipo IN (1, 2, 3, 4)");
+                        });
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.Respuesta", b =>
+                {
+                    b.Property<long>("RespuestaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("respuesta_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("RespuestaId"));
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fecha_registro");
+
+                    b.Property<long>("IntentoId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("intento_id");
+
+                    b.Property<long>("PreguntaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("pregunta_id");
+
+                    b.HasKey("RespuestaId");
+
+                    b.HasIndex("IntentoId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_respuesta_intento");
+
+                    b.HasIndex("PreguntaId")
+                        .HasDatabaseName("ix_respuesta_pregunta");
+
+                    b.ToTable("respuesta", (string)null);
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.RespuestaLibre", b =>
+                {
+                    b.Property<long>("RespuestaId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("respuesta_id");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("texto");
+
+                    b.HasKey("RespuestaId");
+
+                    b.ToTable("respuesta_libre", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_respuesta_libre_texto_no_vacio", "length(trim(texto)) > 0");
+                        });
+                });
+
             modelBuilder.Entity("LISTO.Domain.Entities.Rol", b =>
                 {
                     b.Property<long>("RolId")
@@ -485,6 +835,66 @@ namespace LISTO.Infrastructure.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("LISTO.Domain.Entities.VarianteRespuesta", b =>
+                {
+                    b.Property<long>("VarianteRespuestaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("variante_respuesta_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("VarianteRespuestaId"));
+
+                    b.Property<long>("EspacioCompletarId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("espacio_completar_id");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
+                        .HasColumnName("texto");
+
+                    b.HasKey("VarianteRespuestaId");
+
+                    b.HasIndex("EspacioCompletarId", "Texto")
+                        .IsUnique();
+
+                    b.ToTable("variante_respuesta", (string)null);
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.ConfiguracionRespuestaLibre", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.Pregunta", "Pregunta")
+                        .WithOne("ConfiguracionRespuestaLibre")
+                        .HasForeignKey("LISTO.Domain.Entities.ConfiguracionRespuestaLibre", "PreguntaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Pregunta");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.ConfiguracionVerdaderoFalso", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.Pregunta", "Pregunta")
+                        .WithOne("ConfiguracionVerdaderoFalso")
+                        .HasForeignKey("LISTO.Domain.Entities.ConfiguracionVerdaderoFalso", "PreguntaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Pregunta");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.CriterioEvaluacion", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.ConfiguracionRespuestaLibre", "ConfiguracionRespuestaLibre")
+                        .WithMany("Criterios")
+                        .HasForeignKey("PreguntaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ConfiguracionRespuestaLibre");
+                });
+
             modelBuilder.Entity("LISTO.Domain.Entities.Ejercicio", b =>
                 {
                     b.HasOne("LISTO.Domain.Entities.Curso", "Curso")
@@ -494,6 +904,28 @@ namespace LISTO.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Curso");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.EjercicioVersion", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.Ejercicio", "Ejercicio")
+                        .WithMany("Versiones")
+                        .HasForeignKey("EjercicioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ejercicio");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.EspacioCompletar", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.Pregunta", "Pregunta")
+                        .WithMany("EspaciosCompletar")
+                        .HasForeignKey("PreguntaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Pregunta");
                 });
 
             modelBuilder.Entity("LISTO.Domain.Entities.Estudiante", b =>
@@ -526,6 +958,44 @@ namespace LISTO.Infrastructure.Data.Migrations
                     b.Navigation("PlanCurso");
                 });
 
+            modelBuilder.Entity("LISTO.Domain.Entities.Intento", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.Ejercicio", "Ejercicio")
+                        .WithMany()
+                        .HasForeignKey("EjercicioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LISTO.Domain.Entities.EjercicioVersion", "EjercicioVersion")
+                        .WithMany()
+                        .HasForeignKey("EjercicioVersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LISTO.Domain.Entities.Estudiante", "Estudiante")
+                        .WithMany()
+                        .HasForeignKey("EstudianteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Ejercicio");
+
+                    b.Navigation("EjercicioVersion");
+
+                    b.Navigation("Estudiante");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.OpcionPregunta", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.Pregunta", "Pregunta")
+                        .WithMany("Opciones")
+                        .HasForeignKey("PreguntaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Pregunta");
+                });
+
             modelBuilder.Entity("LISTO.Domain.Entities.PlanCurso", b =>
                 {
                     b.HasOne("LISTO.Domain.Entities.Curso", "Curso")
@@ -552,6 +1022,47 @@ namespace LISTO.Infrastructure.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("LISTO.Domain.Entities.Pregunta", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.EjercicioVersion", "EjercicioVersion")
+                        .WithOne("Pregunta")
+                        .HasForeignKey("LISTO.Domain.Entities.Pregunta", "EjercicioVersionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("EjercicioVersion");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.Respuesta", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.Intento", "Intento")
+                        .WithOne("Respuesta")
+                        .HasForeignKey("LISTO.Domain.Entities.Respuesta", "IntentoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("LISTO.Domain.Entities.Pregunta", "Pregunta")
+                        .WithMany()
+                        .HasForeignKey("PreguntaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Intento");
+
+                    b.Navigation("Pregunta");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.RespuestaLibre", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.Respuesta", "Respuesta")
+                        .WithOne("RespuestaLibre")
+                        .HasForeignKey("LISTO.Domain.Entities.RespuestaLibre", "RespuestaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Respuesta");
+                });
+
             modelBuilder.Entity("LISTO.Domain.Entities.UsuarioRol", b =>
                 {
                     b.HasOne("LISTO.Domain.Entities.Rol", "Rol")
@@ -571,6 +1082,42 @@ namespace LISTO.Infrastructure.Data.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("LISTO.Domain.Entities.VarianteRespuesta", b =>
+                {
+                    b.HasOne("LISTO.Domain.Entities.EspacioCompletar", "EspacioCompletar")
+                        .WithMany("Variantes")
+                        .HasForeignKey("EspacioCompletarId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("EspacioCompletar");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.ConfiguracionRespuestaLibre", b =>
+                {
+                    b.Navigation("Criterios");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.Ejercicio", b =>
+                {
+                    b.Navigation("Versiones");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.EjercicioVersion", b =>
+                {
+                    b.Navigation("Pregunta");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.EspacioCompletar", b =>
+                {
+                    b.Navigation("Variantes");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.Intento", b =>
+                {
+                    b.Navigation("Respuesta");
+                });
+
             modelBuilder.Entity("LISTO.Domain.Entities.PlanEstudios", b =>
                 {
                     b.Navigation("Versiones");
@@ -579,6 +1126,22 @@ namespace LISTO.Infrastructure.Data.Migrations
             modelBuilder.Entity("LISTO.Domain.Entities.PlanEstudiosVersion", b =>
                 {
                     b.Navigation("Cursos");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.Pregunta", b =>
+                {
+                    b.Navigation("ConfiguracionRespuestaLibre");
+
+                    b.Navigation("ConfiguracionVerdaderoFalso");
+
+                    b.Navigation("EspaciosCompletar");
+
+                    b.Navigation("Opciones");
+                });
+
+            modelBuilder.Entity("LISTO.Domain.Entities.Respuesta", b =>
+                {
+                    b.Navigation("RespuestaLibre");
                 });
 #pragma warning restore 612, 618
         }

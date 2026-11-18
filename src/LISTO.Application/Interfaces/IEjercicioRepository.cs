@@ -18,4 +18,8 @@ public interface IEjercicioRepository
 
     Task<int> GuardarCambiosAsync(
         CancellationToken cancellationToken = default);
+
+    Task<Ejercicio?> ObtenerConVersionesPorIdAsync(
+    long ejercicioId,
+    CancellationToken cancellationToken = default);
 }

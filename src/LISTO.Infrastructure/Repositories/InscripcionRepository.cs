@@ -96,4 +96,17 @@ public class InscripcionRepository : IInscripcionRepository
             throw new InscripcionActivaDuplicadaException();
         }
     }
+
+    public async Task<bool> TieneInscripcionActivaEnCursoAsync(
+    long estudianteId,
+    long cursoId,
+    CancellationToken cancellationToken = default)
+    {
+        return await _context.Inscripciones
+            .AnyAsync(
+                i => i.EstudianteId == estudianteId
+                    && i.Estado == EstadoInscripcion.Activa
+                    && i.PlanCurso.CursoId == cursoId,
+                cancellationToken);
+    }
 }
